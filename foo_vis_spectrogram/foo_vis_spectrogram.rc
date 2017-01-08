@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// Englisch (USA) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -58,17 +56,15 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Colors",IDC_STATIC,2,2,316,104
-    LTEXT           "&Low energy",IDC_STATIC,67,17,38,8
-    PUSHBUTTON      "&Low energy",IDC_LOW_ENERGY,10,14,50,14,BS_BITMAP
-    LTEXT           "&High energy",IDC_STATIC,67,36,40,8
-    PUSHBUTTON      "&High energy",IDC_HIGH_ENERGY,10,33,50,14,BS_BITMAP
+    PUSHBUTTON      " &Low energy",IDC_LOW_ENERGY,10,14,108,14
+    PUSHBUTTON      " &High energy",IDC_HIGH_ENERGY,10,33,108,14
     GROUPBOX        "&Blending mode",IDC_STATIC,153,10,157,71
     LTEXT           "Linear (RGB)",IDC_STATIC,219,25,41,8
-    CONTROL         "Linear (RGB)",IDC_BLEND_LINEAR,"Button",BS_AUTORADIOBUTTON | BS_BITMAP | BS_PUSHLIKE | WS_GROUP,161,22,50,14
+    CONTROL         "Linear (RGB)",IDC_BLEND_LINEAR,"Button",BS_AUTORADIOBUTTON | BS_BITMAP | WS_GROUP,161,22,50,14
     LTEXT           "Clockwise (HSV)",IDC_STATIC,219,44,52,8
-    CONTROL         "Clockwise (HSV)",IDC_BLEND_CW,"Button",BS_AUTORADIOBUTTON | BS_BITMAP | BS_PUSHLIKE,161,41,50,14
+    CONTROL         "Clockwise (HSV)",IDC_BLEND_CW,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,161,41,50,14
     LTEXT           "Counter-clockwise (HSV)",IDC_STATIC,219,63,79,8
-    CONTROL         "Counter-clockwise (HSV)",IDC_BLEND_CCW,"Button",BS_AUTORADIOBUTTON | BS_BITMAP | BS_PUSHLIKE,161,60,50,14
+    CONTROL         "Counter-clockwise (HSV)",IDC_BLEND_CCW,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,161,60,50,14
     GROUPBOX        "Update speed",IDC_STATIC,2,112,316,49
     LTEXT           "Frames per second:",IDC_STATIC,9,126,64,8
     EDITTEXT        IDC_REDRAW_PER_SECOND,82,124,40,12,ES_AUTOHSCROLL | ES_NUMBER
@@ -85,7 +81,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_CONFIG, DIALOG
     BEGIN
@@ -97,7 +93,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+#endif    // Englisch (USA) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by foo_vis_spectrum.rc
+// Used by foo_vis_spectrogram.rc
 //
 #define IDD_CONFIG                      101
 #define IDC_LOW_ENERGY                  1001

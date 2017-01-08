@@ -45,9 +45,9 @@ private:
 
 	void EditColor(COLORREF & p_color);
 
-	static void CreateButtonBitmap(CButton & button, CBitmap & bitmap);
-	static void DrawSolidButtonBitmap(CButton & button, CBitmap & bitmap, COLORREF color);
-	static void DrawGradientButtonBitmap(CButton & button, CBitmap & bitmap, service_ptr_t<colormap> mapper);
+    static void CreateButtonBitmap(CButton & button, CBitmap & bitmap, int width, int height);
+    static void DrawSolidButtonBitmap(CButton & button, CBitmap & bitmap, COLORREF color);
+    static void DrawGradientButtonBitmap(CButton & button, CBitmap & bitmap, service_ptr_t<colormap> mapper);
 
 	WTL::CButton
 		m_wndLowEnergy,
@@ -78,14 +78,17 @@ LRESULT CSpectrumPrefsDialog::OnInitDialog(HWND hWndFocus, LPARAM lParamInit)
 	m_wndBlendCW.Attach(GetDlgItem(IDC_BLEND_CW));
 	m_wndBlendCCW.Attach(GetDlgItem(IDC_BLEND_CCW));
 
-	CreateButtonBitmap(m_wndLowEnergy, m_bmLowEnergy);
-	CreateButtonBitmap(m_wndHighEnergy, m_bmHighEnergy);
+    int iconWidth = GetSystemMetrics(SM_CXSMICON);
+    int iconHeight = GetSystemMetrics(SM_CYSMICON);
 
-	CreateButtonBitmap(m_wndBlendLinear, m_bmBlendLinear);
-	CreateButtonBitmap(m_wndBlendCW, m_bmBlendCW);
-	CreateButtonBitmap(m_wndBlendCCW, m_bmBlendCCW);
+    CreateButtonBitmap(m_wndLowEnergy, m_bmLowEnergy, iconWidth, iconHeight);
+    CreateButtonBitmap(m_wndHighEnergy, m_bmHighEnergy, iconWidth, iconHeight);
+   
+    CreateButtonBitmap(m_wndBlendLinear, m_bmBlendLinear, iconWidth * 3, iconHeight);
+    CreateButtonBitmap(m_wndBlendCW, m_bmBlendCW, iconWidth * 3, iconHeight);
+    CreateButtonBitmap(m_wndBlendCCW, m_bmBlendCCW, iconWidth * 3, iconHeight);
 
-	UpdateButtonBitmaps();
+    UpdateButtonBitmaps();
 	UpdateStyleLine();
 
 	switch (cfg_spectrum_color_info.get_value().m_blend_mode)
@@ -233,36 +236,39 @@ void CSpectrumPrefsDialog::EditColor(COLORREF & p_color)
 	}
 }
 
-void CSpectrumPrefsDialog::CreateButtonBitmap(CButton & button, CBitmap & bitmap)
+void CSpectrumPrefsDialog::CreateButtonBitmap(CButton & button, CBitmap & bitmap, int width, int height)
 {
-	CRect rcClient;
-	button.GetClientRect(&rcClient);
-	CClientDC dcWin(button);
-	bitmap.CreateCompatibleBitmap(dcWin, rcClient.Width(), rcClient.Height());
+    CRect rcClient;
+    button.GetClientRect(&rcClient);
+    CClientDC dcWin(button);
+    bitmap.CreateCompatibleBitmap(dcWin, width, height);
 
-	button.SetBitmap(bitmap);
+    button.SetBitmap(bitmap);
 }
 
 void CSpectrumPrefsDialog::DrawSolidButtonBitmap(CButton & button, CBitmap & bitmap, COLORREF color)
 {
-	CRect rcClient;
-	button.GetClientRect(&rcClient);
+    CSize size;
+    bitmap.GetSize(size);
+
 	CClientDC dcWin(button);
 	CDC dcMem;
 	dcMem.CreateCompatibleDC(dcWin);
 
 	CBitmapHandle orgBitmap = dcMem.SelectBitmap(bitmap);
-	dcMem.FillSolidRect(&rcClient, color);
+    dcMem.FillSolidRect(CRect(CPoint(), size), 0xFF000000);
+    dcMem.FillSolidRect(1, 1, size.cx - 2, size.cy - 2, color);
 	dcMem.SelectBitmap(orgBitmap);
 
-	button.RedrawWindow(NULL, NULL, RDW_INVALIDATE);
+    button.SetBitmap(bitmap);
 }
 
 void CSpectrumPrefsDialog::DrawGradientButtonBitmap(CButton & button, CBitmap & bitmap, service_ptr_t<colormap> mapper)
 {
-	CRect rcClient;
-	button.GetClientRect(&rcClient);
-	CClientDC dcWin(button);
+    CSize size;
+    bitmap.GetSize(size);
+
+    CClientDC dcWin(button);
 	CDC dcMem;
 	dcMem.CreateCompatibleDC(dcWin);
 
@@ -271,7 +277,10 @@ void CSpectrumPrefsDialog::DrawGradientButtonBitmap(CButton & button, CBitmap & 
 	pfc::array_t<audio_sample> samples;
 	pfc::array_t<COLORREF> colors;
 
-	int width = rcClient.Width(), height = rcClient.Height();
+    int width = size.cx - 2;
+    int height = size.cy - 2;
+
+    dcMem.FillSolidRect(CRect(CPoint(), size), 0xFF000000);
 
 	samples.set_size(width);
 	colors.set_size(width);
@@ -281,11 +290,11 @@ void CSpectrumPrefsDialog::DrawGradientButtonBitmap(CButton & button, CBitmap & 
 	mapper->map(samples.get_ptr(), colors.get_ptr(), width);
 
 	for (int n = 0; n < width; n++)
-		dcMem.FillSolidRect(n, 0, 1, height, colors[n]);
+		dcMem.FillSolidRect(n + 1, 1, 1, height, colors[n]);
 
 	dcMem.SelectBitmap(orgBitmap);
 
-	button.RedrawWindow(NULL, NULL, RDW_INVALIDATE);
+	button.SetBitmap(bitmap);
 }
 
 const GUID guid_prefs_vis_spectrum = { 0xed947acc, 0x53b8, 0x4cd4, { 0xbc, 0x34, 0x5b, 0x65, 0xc2, 0x7f, 0xc8, 0x94 } };
