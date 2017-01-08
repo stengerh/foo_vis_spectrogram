@@ -43,7 +43,7 @@ static void g_preprocess_chunk(audio_chunk & p_chunk, bool p_adjust_offset)
 		}
 	}
 
-	t_size data_length = p_chunk.get_data_length();
+	t_size data_length = p_chunk.get_used_size();
 	for (t_size n = 0; n < data_length; n++)
 	{
 		audio_sample val = data[n];

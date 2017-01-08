@@ -14,12 +14,12 @@ void spectrum_chunk::set_data(const COLORREF * p_source, t_size p_sample_count, 
 
 void spectrum_chunk::set_data(const audio_chunk & p_source, service_ptr_t<colormap> p_mapper)
 {
-	set_data_size(p_source.get_data_length());
+	set_data_size(p_source.get_used_size());
 	set_sample_count(p_source.get_sample_count());
 	set_sample_rate(p_source.get_sample_rate());
 	set_channels(p_source.get_channels(), p_source.get_channel_config());
 
-	p_mapper->map(p_source.get_data(), get_data(), get_data_length());
+	p_mapper->map(p_source.get_data(), get_data(), get_used_size());
 }
 
 void spectrum_chunk::draw(HDC hdc, int x, int y, int height, const pfc::list_base_const_t<unsigned> & p_channels)

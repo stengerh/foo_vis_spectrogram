@@ -26,7 +26,7 @@ public:
 	void set_channels(unsigned val);
 
 	//! Returns actual amount of audio data contained in the buffer (sample count * channel count). Must not be greater than data size (see get_data_size()).
-	inline t_size get_data_length() const {return get_sample_count() * get_channels();}
+	inline t_size get_used_size() const {return get_sample_count() * get_channels();}
 
 	//! Resets all spectrum_chunk data.
 	inline void reset() {
