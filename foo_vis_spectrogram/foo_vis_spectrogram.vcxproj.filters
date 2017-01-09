@@ -21,9 +21,6 @@
     <ClCompile Include="config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CVisualisationHost.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="prefs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -58,9 +55,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="version.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="foo_vis_spectrogram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CSpectrogramView.cpp">

@@ -93,8 +93,6 @@
     <ClCompile Include="colormap.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="CSpectrogramView.cpp" />
-    <ClCompile Include="CVisualisationHost.cpp" />
-    <ClCompile Include="foo_vis_spectrogram.cpp" />
     <ClCompile Include="prefs.cpp" />
     <ClCompile Include="spectrum_buffer.cpp" />
     <ClCompile Include="spectrum_buffer_impl.cpp" />

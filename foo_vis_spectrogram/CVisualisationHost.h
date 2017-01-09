@@ -136,36 +136,6 @@ protected:
 	}
 };
 
-typedef CWinTraits<WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, WS_EX_TOOLWINDOW> CVisPopupWinTraits;
-
-class CVisualisationPopupHost :
-	public CVisualisationHostImpl<CVisualisationPopupHost, CWindow, CVisPopupWinTraits>
-{
-public:
-	typedef CVisualisationHostImpl<CVisualisationPopupHost, CWindow, CVisPopupWinTraits> baseClass;
-
-	BEGIN_MSG_MAP(CVisualisationPopupHost)
-		MSG_WM_CREATE(OnCreate)
-		MSG_WM_DESTROY(OnDestroy)
-		MSG_WM_CLOSE(OnClose)
-		MSG_WM_KEYDOWN(OnKeyDown)
-		CHAIN_MSG_MAP(baseClass)
-	END_MSG_MAP()
-
-	DECLARE_WND_CLASS(_T("SpectrumPopupClass"));
-
-	void OnFinalMessage(HWND hWnd) {delete this;}
-
-	static CVisualisationPopupHost * g_instance;
-
-private:
-	LRESULT OnCreate(LPCREATESTRUCT lpCreateStruct);
-	void OnDestroy();
-	void OnClose();
-	void OnKeyDown(TCHAR nChar, UINT nRepeatCount, UINT nFlags);
-};
-
-
 
 typedef CWinTraitsOR<0, WS_EX_STATICEDGE> CVisPanelWinTraits;
 
