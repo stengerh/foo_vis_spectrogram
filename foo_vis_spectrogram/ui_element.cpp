@@ -53,17 +53,11 @@ public:
 		catch (const exception_io &)
 		{
 		}
-		SetReduceBandingMode((flags & 1) != 0);
-		SetSmoothScalingMode((flags & 2) != 0);
 	}
 
 	virtual ui_element_config::ptr get_configuration() {
 		ui_element_config_builder builder;
 		t_uint32 flags = 0;
-		if (GetReduceBandingMode())
-			flags |= 1;
-		if (GetSmoothScalingMode())
-			flags |= 2;
 		builder.write_int(flags);
 		return builder.finish(get_guid());
 	}
@@ -89,12 +83,6 @@ public:
 	virtual void edit_mode_context_menu_build(const POINT & p_point, bool p_fromkeyboard, HMENU p_menu, unsigned p_id_base)
 	{
 		AppendMenu(p_menu, MF_STRING, p_id_base + ID_CONFIG, _T("Settings..."));
-#ifdef HAVE_REDUCE_BANDING_OPTION
-		AppendMenu(p_menu, MF_STRING | (GetReduceBandingMode() ? MF_CHECKED : 0), p_id_base + ID_REDUCE_BANDING, _T("Reduce Banding"));
-#endif
-#ifdef HAVE_SMOOTH_SCALING_OPTION
-		AppendMenu(p_menu, MF_STRING | (GetSmoothScalingMode() ? MF_CHECKED : 0), p_id_base + ID_SMOOTH_SCALING, _T("Smooth Scaling"));
-#endif
 	}
 
 	virtual void edit_mode_context_menu_command(const POINT & p_point, bool p_fromkeyboard, unsigned p_id, unsigned p_id_base)
@@ -104,16 +92,6 @@ public:
         case ID_CONFIG:
 			static_api_ptr_t<ui_control>()->show_preferences(guid_prefs_vis_spectrum);
 			break;
-#ifdef HAVE_REDUCE_BANDING_OPTION
-		case ID_REDUCE_BANDING:
-			SetReduceBandingMode(!GetReduceBandingMode());
-			break;
-#endif
-#ifdef HAVE_SMOOTH_SCALING_OPTION
-		case ID_SMOOTH_SCALING:
-			SetSmoothScalingMode(!GetSmoothScalingMode());
-			break;
-#endif
 		}
 	}
 

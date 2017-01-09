@@ -23,12 +23,6 @@ public:
 
 	void set_callback(ui_element_instance_callback_ptr p_callback) {m_callback = p_callback;}
 
-	bool GetReduceBandingMode() {return m_view.get_reduce_banding();}
-	void SetReduceBandingMode(bool p_state) {m_view.set_reduce_banding(p_state);}
-
-	bool GetSmoothScalingMode() {return m_view.get_smooth_scaling();}
-	void SetSmoothScalingMode(bool p_state) {m_view.set_smooth_scaling(p_state);}
-
 protected:
 	CSpectrogramView m_view;
 	ui_element_instance_callback_ptr m_callback;
@@ -99,14 +93,6 @@ protected:
 
 		menu.AppendMenu(MF_STRING, ID_CONFIG, _T("Settings..."));
 
-#ifdef HAVE_REDUCE_BANDING_OPTION
-		menu.AppendMenu(MF_STRING | (GetReduceBandingMode() ? MF_CHECKED : 0), ID_REDUCE_BANDING, _T("Reduce Banding"));
-#endif
-
-#ifdef HAVE_SMOOTH_SCALING_OPTION
-		menu.AppendMenu(MF_STRING | (GetSmoothScalingMode() ? MF_CHECKED : 0), ID_SMOOTH_SCALING, _T("Smooth Scaling"));
-#endif
-
 		if (menu.GetMenuItemCount() > 0)
 		{
 			const int rv = (int)menu.TrackPopupMenu(TPM_RETURNCMD | TPM_RIGHTBUTTON |TPM_NONOTIFY, ptScreen.x, ptScreen.y, m_hWnd);
@@ -119,18 +105,6 @@ protected:
             {
                 ToggleFullScreenMode();
             }
-#ifdef HAVE_REDUCE_BANDING_OPTION
-			else if (rv == ID_REDUCE_BANDING)
-			{
-				SetReduceBandingMode(!GetReduceBandingMode());
-			}
-#endif
-#ifdef HAVE_SMOOTH_SCALING_OPTION
-			else if (rv == ID_SMOOTH_SCALING)
-			{
-				SetSmoothScalingMode(!GetSmoothScalingMode());
-			}
-#endif
 		}
 	}
 

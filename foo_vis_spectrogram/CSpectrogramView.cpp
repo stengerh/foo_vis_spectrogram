@@ -11,29 +11,11 @@ static COLORREF cfg_spectrum_background = RGB(0, 0, 0);
 
 pfc::instance_tracker_server_t<CSpectrogramView> CSpectrogramView::g_instances;
 
-static void g_preprocess_chunk(audio_chunk & p_chunk, bool p_adjust_offset)
+static void g_preprocess_chunk(audio_chunk & p_chunk)
 {
 	static double log2_div = 1.0/log(2.0);
 
 	audio_sample * data = p_chunk.get_data();
-
-	if (p_adjust_offset)
-	{
-		unsigned channel_count = p_chunk.get_channels();
-		t_size sample_count = p_chunk.get_sample_count();
-
-		pfc::array_t<audio_sample> offset;
-		offset.set_data_fromptr(&data[sample_count * channel_count - channel_count], channel_count);
-
-		audio_sample * current = data;
-		for (t_size sample = 0; sample < sample_count; sample++)
-		{
-			for (unsigned channel = 0; channel < channel_count; channel++)
-			{
-				*current++ -= offset[channel];
-			}
-		}
-	}
 
 	t_size data_length = p_chunk.get_used_size();
 	for (t_size n = 0; n < data_length; n++)
@@ -80,10 +62,8 @@ LRESULT CSpectrogramView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	//m_scaling_quality = spectrum_buffer::scaling_mode_gdi_fast;
-	m_reduce_banding = false;
-	m_smooth_scaling = false;
 
-	UpdateColorMapper();
+    UpdateColorMapper();
 
 	CRect rcClient;
 	GetClientRect(&rcClient);
@@ -133,7 +113,7 @@ void CSpectrogramView::CheckStreamUpdates()
 			{
 				if (m_spectrum_cache->get_size() > 0 && m_stream->get_spectrum_absolute(chunk, m_last_time, 512))
 				{
-					g_preprocess_chunk(chunk, m_reduce_banding);
+					g_preprocess_chunk(chunk);
 
 					m_spectrum_cache->add_chunk(chunk);
 				}
@@ -175,7 +155,7 @@ void CSpectrogramView::OnPaint(HDC hDC)
 
 			m_spectrum_cache->draw(dc, rc, m_spectrum_cache->get_end_time() - (rcClient.right - rc.left),
 				cfg_spectrum_background,
-				m_smooth_scaling ? spectrum_buffer::scaling_mode_gdi_slow : spectrum_buffer::scaling_mode_gdi_fast);
+				spectrum_buffer::scaling_mode_gdi_slow);
 
 			SetStretchBltMode(dcCache, orgStretchMode);
 		}
@@ -401,21 +381,6 @@ void CSpectrogramView::on_spectrum_colors_changed(const t_spectrum_color_info & 
 
 	    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
     }
-}
-
-void CSpectrogramView::set_smooth_scaling(bool p_state)
-{
-	if (p_state != m_smooth_scaling)
-	{
-		m_smooth_scaling = p_state;
-
-        if (m_hWnd)
-        {
-		    ClearDisplayCache();
-
-		    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-        }
-	}
 }
 
 void CSpectrogramView::UpdateColorMapper()

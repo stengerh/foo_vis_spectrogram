@@ -39,12 +39,6 @@ public:
 	//spectrum_buffer::t_scaling_mode get_scaling_quality() {return m_scaling_quality;}
 	//void set_scaling_quality(spectrum_buffer::t_scaling_mode p_quality);
 
-	bool get_reduce_banding() {return m_reduce_banding;}
-	void set_reduce_banding(bool p_state) {m_reduce_banding = p_state;}
-
-	bool get_smooth_scaling() {return m_smooth_scaling;}
-	void set_smooth_scaling(bool p_state);
-
 private:
 	pfc::instance_tracker_client_t<CSpectrogramView, g_instances> m_instance_tracker;
 
@@ -92,7 +86,6 @@ private:
 	unsigned m_frames_per_second;
 
 	//spectrum_buffer::t_scaling_mode m_scaling_quality;
-	bool m_reduce_banding, m_smooth_scaling;
 
 	service_ptr_t<visualisation_stream> m_stream;
 	double m_last_time;
