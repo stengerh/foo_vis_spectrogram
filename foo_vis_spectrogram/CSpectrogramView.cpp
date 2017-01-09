@@ -395,9 +395,12 @@ void CSpectrogramView::on_spectrum_colors_changed(const t_spectrum_color_info & 
 
 	m_spectrum_cache->set_colormap(m_mapper);
 
-	ClearDisplayCache();
+    if (m_hWnd)
+    {
+	    ClearDisplayCache();
 
-	RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+	    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+    }
 }
 
 void CSpectrogramView::set_smooth_scaling(bool p_state)
@@ -406,9 +409,12 @@ void CSpectrogramView::set_smooth_scaling(bool p_state)
 	{
 		m_smooth_scaling = p_state;
 
-		ClearDisplayCache();
+        if (m_hWnd)
+        {
+		    ClearDisplayCache();
 
-		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+		    RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+        }
 	}
 }
 

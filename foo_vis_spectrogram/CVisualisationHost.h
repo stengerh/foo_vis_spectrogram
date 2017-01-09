@@ -38,6 +38,7 @@ protected:
 		ID_CONFIG = 1,
 		ID_SMOOTH_SCALING,
 		ID_REDUCE_BANDING,
+        ID_FULLSCREEN,
 
 		ID_LAST_COMMAND
 	};
@@ -92,6 +93,10 @@ protected:
 
 		//spectrum_buffer::t_scaling_mode scaling_quality = m_view.get_scaling_quality();
 
+        menu.AppendMenu(MF_STRING, ID_FULLSCREEN, _T("Toggle Full-Screen Mode"));
+
+        menu.AppendMenu(MF_SEPARATOR);
+
 		menu.AppendMenu(MF_STRING, ID_CONFIG, _T("Settings..."));
 
 #ifdef HAVE_REDUCE_BANDING_OPTION
@@ -110,6 +115,10 @@ protected:
 			{
 				static_api_ptr_t<ui_control>()->show_preferences(guid_prefs_vis_spectrum);
 			}
+            else if (rv == ID_FULLSCREEN)
+            {
+                ToggleFullScreenMode();
+            }
 #ifdef HAVE_REDUCE_BANDING_OPTION
 			else if (rv == ID_REDUCE_BANDING)
 			{
@@ -134,10 +143,12 @@ protected:
 			m_view.SetWindowPos(NULL, &rcClient, SWP_NOZORDER | SWP_NOACTIVATE);
 		}
 	}
+
+    virtual void ToggleFullScreenMode() = 0;
 };
 
 
-typedef CWinTraitsOR<0, WS_EX_STATICEDGE> CVisPanelWinTraits;
+typedef CWinTraitsOR<0, 0> CVisPanelWinTraits;
 
 class CVisualisationPanelHost :
 	public CVisualisationHostImpl<CVisualisationPanelHost, CWindow, CVisPanelWinTraits>
@@ -149,7 +160,7 @@ public:
 		CHAIN_MSG_MAP(baseClass)
 	END_MSG_MAP()
 
-	DECLARE_WND_CLASS(_T("SpectrumPanelClass"));
+	DECLARE_WND_CLASS(_T("SpectrogramPanelClass"));
 };
 
 #endif

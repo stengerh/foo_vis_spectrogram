@@ -9,24 +9,39 @@
 static const GUID guid_element_spectrogram = 
 { 0x91bfe9ef, 0x879b, 0x4534, { 0xa9, 0x30, 0x51, 0xa8, 0xc6, 0xce, 0x88, 0xb1 } };
 
-class spectrogram_instance : public ui_element_instance
+class spectrogram_instance : public ui_element_instance, public CVisualisationPanelHost
 {
-	CVisualisationPanelHost m_wndView;
 public:
-	spectrogram_instance(HWND p_parent, ui_element_instance_callback_ptr p_callback) {
-		m_wndView.set_callback(p_callback);
-		HWND hWnd = m_wndView.Create(p_parent, 0, _T("Spectrogram"));
+	static GUID g_get_guid() {
+		return guid_element_spectrogram;
+	}
+	
+	static GUID g_get_subclass()
+	{
+		return ui_element_subclass_playback_visualisation;
 	}
 
-	~spectrogram_instance() {
-		if (m_wndView.IsWindow()) {
-			m_wndView.DestroyWindow();
-		}
+	static void g_get_name(pfc::string_base & p_out) {
+		p_out = "Spectrogram by foosion";
 	}
 
-	virtual HWND get_wnd() {
-		return m_wndView;
+    static const char * g_get_description() {
+        return "Alternate spectrogram visualization.";
+    }
+
+	static ui_element_config::ptr g_get_default_configuration() {
+		ui_element_config_builder builder;
+		return builder.finish(g_get_guid());
 	}
+
+    spectrogram_instance(ui_element_config::ptr p_data, ui_element_instance_callback::ptr p_callback) {
+		set_callback(p_callback);
+        set_configuration(p_data);
+	}
+
+    void initialize_window(HWND p_parent) {
+		Create(p_parent, nullptr, _T("Spectrogram"));
+    }
 
 	virtual void set_configuration(ui_element_config::ptr cfg) {
 		ui_element_config_parser parser(cfg);
@@ -38,16 +53,16 @@ public:
 		catch (const exception_io &)
 		{
 		}
-		m_wndView.SetReduceBandingMode((flags & 1) != 0);
-		m_wndView.SetSmoothScalingMode((flags & 2) != 0);
+		SetReduceBandingMode((flags & 1) != 0);
+		SetSmoothScalingMode((flags & 2) != 0);
 	}
 
 	virtual ui_element_config::ptr get_configuration() {
 		ui_element_config_builder builder;
 		t_uint32 flags = 0;
-		if (m_wndView.GetReduceBandingMode())
+		if (GetReduceBandingMode())
 			flags |= 1;
-		if (m_wndView.GetSmoothScalingMode())
+		if (GetSmoothScalingMode())
 			flags |= 2;
 		builder.write_int(flags);
 		return builder.finish(get_guid());
@@ -71,20 +86,14 @@ public:
 		return true;
 	}
 
-	enum {
-		ID_SETTINGS = 1,
-		ID_REDUCE_BANDING,
-		ID_SMOOTH_SCALING,
-	};
-
 	virtual void edit_mode_context_menu_build(const POINT & p_point, bool p_fromkeyboard, HMENU p_menu, unsigned p_id_base)
 	{
-		AppendMenu(p_menu, MF_STRING, p_id_base + ID_SETTINGS, _T("Settings..."));
+		AppendMenu(p_menu, MF_STRING, p_id_base + ID_CONFIG, _T("Settings..."));
 #ifdef HAVE_REDUCE_BANDING_OPTION
-		AppendMenu(p_menu, MF_STRING | (m_wndView.GetReduceBandingMode() ? MF_CHECKED : 0), p_id_base + ID_REDUCE_BANDING, _T("Reduce Banding"));
+		AppendMenu(p_menu, MF_STRING | (GetReduceBandingMode() ? MF_CHECKED : 0), p_id_base + ID_REDUCE_BANDING, _T("Reduce Banding"));
 #endif
 #ifdef HAVE_SMOOTH_SCALING_OPTION
-		AppendMenu(p_menu, MF_STRING | (m_wndView.GetSmoothScalingMode() ? MF_CHECKED : 0), p_id_base + ID_SMOOTH_SCALING, _T("Smooth Scaling"));
+		AppendMenu(p_menu, MF_STRING | (GetSmoothScalingMode() ? MF_CHECKED : 0), p_id_base + ID_SMOOTH_SCALING, _T("Smooth Scaling"));
 #endif
 	}
 
@@ -92,17 +101,17 @@ public:
 	{
 		switch (p_id - p_id_base)
 		{
-		case ID_SETTINGS:
+        case ID_CONFIG:
 			static_api_ptr_t<ui_control>()->show_preferences(guid_prefs_vis_spectrum);
 			break;
 #ifdef HAVE_REDUCE_BANDING_OPTION
 		case ID_REDUCE_BANDING:
-			m_wndView.SetReduceBandingMode(!m_wndView.GetReduceBandingMode());
+			SetReduceBandingMode(!GetReduceBandingMode());
 			break;
 #endif
 #ifdef HAVE_SMOOTH_SCALING_OPTION
 		case ID_SMOOTH_SCALING:
-			m_wndView.SetSmoothScalingMode(!m_wndView.GetSmoothScalingMode());
+			SetSmoothScalingMode(!GetSmoothScalingMode());
 			break;
 #endif
 		}
@@ -115,7 +124,7 @@ public:
 	{
 		switch (p_id - p_id_base)
 		{
-		case ID_SETTINGS:
+		case ID_CONFIG:
 			p_out = "Shows settings for spectrogram visualisation.";
 			return true;
 
@@ -134,39 +143,10 @@ public:
 			return false;
 		}
 	}
+
+    virtual void ToggleFullScreenMode() {
+        static_api_ptr_t<ui_element_common_methods_v2>()->toggle_fullscreen(g_get_guid(), core_api::get_main_window());
+    }
 };
 
-class spectrogram : public ui_element {
-public:
-	virtual GUID get_guid() {
-		return guid_element_spectrogram;
-	}
-	
-	virtual GUID get_subclass()
-	{
-		return ui_element_subclass_playback_visualisation;
-	}
-
-	virtual void get_name(pfc::string_base & p_out) {
-		p_out = "Spectrogram by foosion";
-	}
-
-	virtual ui_element_instance_ptr instantiate(HWND p_parent, ui_element_config::ptr cfg, ui_element_instance_callback_ptr p_callback) {
-		service_ptr_t<spectrogram_instance> instance;
-		instance = new service_impl_t<spectrogram_instance>(p_parent, p_callback);
-		instance->set_configuration(cfg);
-		return instance;
-	}
-
-	virtual ui_element_config::ptr get_default_configuration() {
-		ui_element_config_builder builder;
-		return builder.finish(get_guid());
-	}
-
-	virtual ui_element_children_enumerator_ptr enumerate_children(ui_element_config::ptr) {
-		return 0;
-	}
-
-};
-
-static service_factory_single_t<spectrogram> foo_spectrogram;
+static service_factory_single_t< ui_element_impl_visualisation< spectrogram_instance > > foo_spectrogram;
