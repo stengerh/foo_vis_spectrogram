@@ -11,5 +11,5 @@ const GUID visualisation_timer_manager::class_guid =
 
 void visualisation_timer_manager::g_create_timer(service_ptr_t<visualisation_timer> & p_timer, unsigned p_elapse)
 {
-	static_api_ptr_t<visualisation_timer_manager>()->create_timer(p_timer, p_elapse);
+    static_api_ptr_t<visualisation_timer_manager>()->create_timer(p_timer, p_elapse);
 }

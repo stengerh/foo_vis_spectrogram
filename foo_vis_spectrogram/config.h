@@ -6,9 +6,9 @@ extern cfg_window_placement cfg_popup_window_placement;
 
 enum t_blend_mode
 {
-	blend_mode_linear,
-	blend_mode_clockwise,
-	blend_mode_counterclockwise,
+    blend_mode_linear,
+    blend_mode_clockwise,
+    blend_mode_counterclockwise,
 };
 
 extern cfg_struct_t<t_spectrum_color_info> cfg_spectrum_color_info;

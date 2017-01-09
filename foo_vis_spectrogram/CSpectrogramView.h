@@ -13,95 +13,95 @@ public:
 };
 
 class CSpectrogramView :
-	public CWindowImpl<CSpectrogramView>,
-	private play_callback,
-	private visualisation_timer_callback
+    public CWindowImpl<CSpectrogramView>,
+    private play_callback,
+    private visualisation_timer_callback
 {
 public:
-	CSpectrogramView();
-	~CSpectrogramView();
+    CSpectrogramView();
+    ~CSpectrogramView();
 
-	BEGIN_MSG_MAP(CSpectrogramView)
-		MSG_WM_CREATE(OnCreate)
-		MSG_WM_DESTROY(OnDestroy)
-		MSG_WM_PAINT(OnPaint)
-		MSG_WM_SIZE(OnSize)
-		MSG_WM_ENTERSIZEMOVE(OnEnterSizeMove)
-		MSG_WM_EXITSIZEMOVE(OnExitSizeMove)
-	END_MSG_MAP()
+    BEGIN_MSG_MAP(CSpectrogramView)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_PAINT(OnPaint)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_ENTERSIZEMOVE(OnEnterSizeMove)
+        MSG_WM_EXITSIZEMOVE(OnExitSizeMove)
+    END_MSG_MAP()
 
-	static ATL::CWndClassInfo& GetWndClassInfo();
+    static ATL::CWndClassInfo& GetWndClassInfo();
 
-	static pfc::instance_tracker_server_t<CSpectrogramView> g_instances;
+    static pfc::instance_tracker_server_t<CSpectrogramView> g_instances;
 
-	void on_spectrum_colors_changed(const t_spectrum_color_info & p_info);
+    void on_spectrum_colors_changed(const t_spectrum_color_info & p_info);
 
-	//spectrum_buffer::t_scaling_mode get_scaling_quality() {return m_scaling_quality;}
-	//void set_scaling_quality(spectrum_buffer::t_scaling_mode p_quality);
+    //spectrum_buffer::t_scaling_mode get_scaling_quality() {return m_scaling_quality;}
+    //void set_scaling_quality(spectrum_buffer::t_scaling_mode p_quality);
 
 private:
-	pfc::instance_tracker_client_t<CSpectrogramView, g_instances> m_instance_tracker;
+    pfc::instance_tracker_client_t<CSpectrogramView, g_instances> m_instance_tracker;
 
-	LRESULT OnCreate(LPCREATESTRUCT lpCreateStruct);
-	void OnDestroy();
-	void OnPaint(HDC hDC);
-	void OnSize(UINT nType, CSize size);
-	void OnEnterSizeMove();
-	void OnExitSizeMove();
+    LRESULT OnCreate(LPCREATESTRUCT lpCreateStruct);
+    void OnDestroy();
+    void OnPaint(HDC hDC);
+    void OnSize(UINT nType, CSize size);
+    void OnEnterSizeMove();
+    void OnExitSizeMove();
 
-	bool EnableUpdates();
-	bool DisableUpdates();
+    bool EnableUpdates();
+    bool DisableUpdates();
 
-	void CheckStreamUpdates();
+    void CheckStreamUpdates();
 
-	void ResizeDisplayCache(CSize size);
-	void ClearDisplayCache();
+    void ResizeDisplayCache(CSize size);
+    void ClearDisplayCache();
 
-	void UpdateColorMapper();
+    void UpdateColorMapper();
 
-	void register_play_callback();
-	void unregister_play_callback();
+    void register_play_callback();
+    void unregister_play_callback();
 
-	// play_callback methods
+    // play_callback methods
 
-	virtual void FB2KAPI on_playback_starting(play_control::t_track_command p_command, bool p_paused);
-	virtual void FB2KAPI on_playback_new_track(metadb_handle_ptr p_track) {}
-	virtual void FB2KAPI on_playback_stop(play_control::t_stop_reason p_reason);
-	virtual void FB2KAPI on_playback_seek(double p_time);
-	virtual void FB2KAPI on_playback_pause(bool p_state);
-	virtual void FB2KAPI on_playback_edited(metadb_handle_ptr p_track) {}
-	virtual void FB2KAPI on_playback_dynamic_info(const file_info & p_info) {}
-	virtual void FB2KAPI on_playback_dynamic_info_track(const file_info & p_info) {}
-	virtual void FB2KAPI on_playback_time(double p_time) {}
-	virtual void FB2KAPI on_volume_change(float p_new_val) {}
+    virtual void FB2KAPI on_playback_starting(play_control::t_track_command p_command, bool p_paused);
+    virtual void FB2KAPI on_playback_new_track(metadb_handle_ptr p_track) {}
+    virtual void FB2KAPI on_playback_stop(play_control::t_stop_reason p_reason);
+    virtual void FB2KAPI on_playback_seek(double p_time);
+    virtual void FB2KAPI on_playback_pause(bool p_state);
+    virtual void FB2KAPI on_playback_edited(metadb_handle_ptr p_track) {}
+    virtual void FB2KAPI on_playback_dynamic_info(const file_info & p_info) {}
+    virtual void FB2KAPI on_playback_dynamic_info_track(const file_info & p_info) {}
+    virtual void FB2KAPI on_playback_time(double p_time) {}
+    virtual void FB2KAPI on_volume_change(float p_new_val) {}
 
-	// visualisation_timer_callback methods
+    // visualisation_timer_callback methods
 
-	virtual void on_visualisation_timer();
+    virtual void on_visualisation_timer();
 
-	// fields
+    // fields
 
-	bool m_play_callback_registered;
+    bool m_play_callback_registered;
 
-	unsigned m_frames_per_second;
+    unsigned m_frames_per_second;
 
-	//spectrum_buffer::t_scaling_mode m_scaling_quality;
+    //spectrum_buffer::t_scaling_mode m_scaling_quality;
 
-	service_ptr_t<visualisation_stream> m_stream;
-	double m_last_time;
-	int m_column;
+    service_ptr_t<visualisation_stream> m_stream;
+    double m_last_time;
+    int m_column;
 
-	service_ptr_t<visualisation_timer> m_timer;
+    service_ptr_t<visualisation_timer> m_timer;
 
-	service_ptr_t<spectrum_buffer> m_spectrum_cache;
+    service_ptr_t<spectrum_buffer> m_spectrum_cache;
 
-	CBitmap m_display_cache;
-	t_spectrum_timestamp m_last_displayed_time;
+    CBitmap m_display_cache;
+    t_spectrum_timestamp m_last_displayed_time;
 
-	bool m_size_changing;
-	CSize m_size;
+    bool m_size_changing;
+    CSize m_size;
 
-	service_ptr_t<colormap> m_mapper;
+    service_ptr_t<colormap> m_mapper;
 };
 
 #endif
