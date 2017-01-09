@@ -13,30 +13,34 @@ pfc::instance_tracker_server_t<CSpectrogramView> CSpectrogramView::g_instances;
 
 static void g_preprocess_chunk(audio_chunk & p_chunk)
 {
-	static double log2_div = 1.0/log(2.0);
+	static audio_sample log2_div = 1.0f / log(2.0f);
+    static audio_sample log10_div = 1.0f / log(10.0f);
 
 	audio_sample * data = p_chunk.get_data();
 
-	t_size data_length = p_chunk.get_used_size();
-	for (t_size n = 0; n < data_length; n++)
-	{
-		audio_sample val = pfc::abs_t(data[n]);
-		val = (audio_sample)(sqrt(log((val * 0.5) + 1)) * log2_div);
-		//val *= 0.5;
-		if (val > 1.0) val = 1.0;
-		data[n] = val;
-	}
-
 #if 0
 	audio_sample minval = data[0], maxval = data[0];
-	for (t_size n = 0; n < data_length; n++)
+    for (t_size n = 0; n < p_chunk.get_used_size(); n++)
 	{
 		audio_sample val = pfc::abs_t(data[n]);
 		if (val < minval) minval = val;
 		if (val > maxval) maxval = val;
 	}
-	//uDebugLog() << "min = " << minval << ", max = " << maxval;
+	uDebugLog() << "min = " << minval << ", max = " << maxval;
 #endif
+
+    static double upper_limit_db = 0.0;
+    static double lower_limit_db = -4.0;
+
+	t_size data_length = p_chunk.get_used_size();
+	for (t_size n = 0; n < data_length; n++)
+	{
+		audio_sample val = data[n];
+        audio_sample db = log(val) * log10_div;
+        val = audio_sample((db - lower_limit_db) / (upper_limit_db - lower_limit_db));
+        val = pfc::clip_t(val, 0.0f, 1.0f);
+		data[n] = val;
+	}
 }
 
 CSpectrogramView::CSpectrogramView()
@@ -257,7 +261,7 @@ bool CSpectrogramView::EnableUpdates()
 	try
 	{
 		static_api_ptr_t<visualisation_manager> vm;
-		vm->create_stream(m_stream, 0);
+        vm->create_stream(m_stream, visualisation_manager::KStreamFlagNewFFT);
 
 		m_frames_per_second = cfg_frames_per_second;
 		static_api_ptr_t<visualisation_timer_manager>()->create_timer_for_rate(m_timer, m_frames_per_second);
