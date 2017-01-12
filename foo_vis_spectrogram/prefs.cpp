@@ -3,6 +3,8 @@
 #include "config.h"
 #include "resource.h"
 
+#define U2T(text) (pfc::stringcvt::string_os_from_utf8(text).get_ptr())
+
 struct t_custom_colors
 {
     DWORD m_colors[16];
@@ -17,6 +19,15 @@ static const GUID guid_cfg_custom_colors = { 0xa89b6fef, 0x3266, 0x4f1c, { 0x81,
 
 cfg_struct_t<t_custom_colors> cfg_custom_colors(guid_cfg_custom_colors, t_custom_colors());
 
+class format_centibel : public pfc::string_formatter
+{
+public:
+	format_centibel(int centibel)
+	{
+		*this << pfc::format_fixedpoint(centibel, 1) << " dB";
+	}
+};
+
 class CSpectrumPrefsDialog :
     public CDialogImpl<CSpectrumPrefsDialog>
 {
@@ -29,7 +40,8 @@ public:
         COMMAND_CODE_HANDLER_EX(BN_CLICKED, OnButtonClicked)
         COMMAND_HANDLER_EX(IDC_STYLELINE, CBN_EDITCHANGE, OnStyleLineEditChange)
         COMMAND_CODE_HANDLER_EX(EN_CHANGE, OnEditChange)
-    END_MSG_MAP();
+		MSG_WM_HSCROLL(OnHScroll)
+	END_MSG_MAP();
 
 private:
     virtual void OnFinalMessage(HWND hWnd);
@@ -39,6 +51,7 @@ private:
     void OnButtonClicked(UINT nCode, int nId, HWND hWndFrom);
     void OnEditChange(UINT nCode, int nId, HWND hWndFrom);
     void OnStyleLineEditChange(UINT nCode, int nId, HWND hWndFrom);
+	void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar);
 
     void UpdateButtonBitmaps();
     void UpdateStyleLine();
@@ -62,6 +75,12 @@ private:
         m_bmBlendLinear,
         m_bmBlendCW,
         m_bmBlendCCW;
+
+	CStatic m_lowPowerLabel;
+	CStatic m_highPowerLabel;
+
+	CTrackBarCtrl m_lowPowerCentibelsTrackBar;
+	CTrackBarCtrl m_highPowerCentibelsTrackBar;
 };
 
 void CSpectrumPrefsDialog::OnFinalMessage(HWND hWnd)
@@ -77,6 +96,12 @@ LRESULT CSpectrumPrefsDialog::OnInitDialog(HWND hWndFocus, LPARAM lParamInit)
     m_wndBlendLinear.Attach(GetDlgItem(IDC_BLEND_LINEAR));
     m_wndBlendCW.Attach(GetDlgItem(IDC_BLEND_CW));
     m_wndBlendCCW.Attach(GetDlgItem(IDC_BLEND_CCW));
+
+	m_lowPowerLabel.Attach(GetDlgItem(IDC_LOW_POWER_LABEL));
+	m_highPowerLabel.Attach(GetDlgItem(IDC_HIGH_POWER_LABEL));
+
+	m_lowPowerCentibelsTrackBar.Attach(GetDlgItem(IDC_LOW_POWER_CENTIBEL));
+	m_highPowerCentibelsTrackBar.Attach(GetDlgItem(IDC_HIGH_POWER_CENTIBEL));
 
     int iconWidth = GetSystemMetrics(SM_CXSMICON);
     int iconHeight = GetSystemMetrics(SM_CYSMICON);
@@ -107,7 +132,30 @@ LRESULT CSpectrumPrefsDialog::OnInitDialog(HWND hWndFocus, LPARAM lParamInit)
     SetDlgItemInt(IDC_REDRAW_PER_SECOND, cfg_frames_per_second, FALSE);
     SetDlgItemInt(IDC_LINES_PER_SECOND, cfg_lines_per_second, FALSE);
 
-    return 0;
+	m_lowPowerCentibelsTrackBar.SetRange(-120 + 120, 20 + 120);
+	m_highPowerCentibelsTrackBar.SetRange(-120 + 120, 20 + 120);
+
+	{
+		int power_centibel = cfg_low_power_centibel;
+		CStatic &label = m_lowPowerLabel;
+		CTrackBarCtrl trackBar = m_lowPowerCentibelsTrackBar;
+
+		label.SetWindowText(U2T(format_centibel(power_centibel)));
+
+		trackBar.SetPos(power_centibel / 10 + 120);
+	}
+
+	{
+		int power_centibel = cfg_high_power_centibel;
+		CStatic &label = m_highPowerLabel;
+		CTrackBarCtrl trackBar = m_highPowerCentibelsTrackBar;
+
+		label.SetWindowText(U2T(format_centibel(power_centibel)));
+
+		trackBar.SetPos(power_centibel / 10 + 120);
+	}
+
+	return 0;
 }
 
 void CSpectrumPrefsDialog::OnDestroy()
@@ -188,6 +236,24 @@ void CSpectrumPrefsDialog::OnEditChange(UINT nCode, int nId, HWND hWndFrom)
     {
         SetMsgHandled(FALSE);
     }
+}
+
+void CSpectrumPrefsDialog::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar pScrollBar)
+{
+	if (pScrollBar == m_highPowerCentibelsTrackBar)
+	{
+		int power_centibel = (m_highPowerCentibelsTrackBar.GetPos() - 120) * 10;
+		cfg_high_power_centibel = power_centibel;
+
+		m_highPowerLabel.SetWindowText(U2T(format_centibel(power_centibel)));
+	}
+	else if (pScrollBar == m_lowPowerCentibelsTrackBar)
+	{
+		int power_centibel = (m_lowPowerCentibelsTrackBar.GetPos() - 120) * 10;
+		cfg_low_power_centibel = power_centibel;
+
+		m_lowPowerLabel.SetWindowText(U2T(format_centibel(power_centibel)));
+	}
 }
 
 void CSpectrumPrefsDialog::UpdateButtonBitmaps()
