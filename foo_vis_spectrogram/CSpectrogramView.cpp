@@ -13,12 +13,11 @@ pfc::instance_tracker_server_t<CSpectrogramView> CSpectrogramView::g_instances;
 
 static void g_preprocess_chunk(audio_chunk & p_chunk)
 {
-    static audio_sample log2_div = 1.0f / log(2.0f);
-    static audio_sample log10_div = 1.0f / log(10.0f);
+    static const audio_sample log10_div = 1.0f / log(10.0f);
 
     audio_sample * data = p_chunk.get_data();
 
-#if 0
+#ifdef _DEBUG
     audio_sample minval = data[0], maxval = data[0];
     for (t_size n = 0; n < p_chunk.get_used_size(); n++)
     {
@@ -29,17 +28,16 @@ static void g_preprocess_chunk(audio_chunk & p_chunk)
     uDebugLog() << "min = " << minval << ", max = " << maxval;
 #endif
 
-    static double upper_limit_db = 0.0;
-    static double lower_limit_db = -4.0;
+    static double high_power_db = 0.0;
+    static double low_power_db = -80.0;
 
     t_size data_length = p_chunk.get_used_size();
     for (t_size n = 0; n < data_length; n++)
     {
-        audio_sample val = data[n];
-        audio_sample db = log(val) * log10_div;
-        val = audio_sample((db - lower_limit_db) / (upper_limit_db - lower_limit_db));
-        val = pfc::clip_t(val, 0.0f, 1.0f);
-        data[n] = val;
+        const audio_sample amplitude = data[n];
+        const audio_sample power_db = 20.0f * log(amplitude) * log10_div;
+        const audio_sample lerp_factor = audio_sample((power_db - low_power_db) / (high_power_db - low_power_db));
+        data[n] = pfc::clip_t(lerp_factor, 0.0f, 1.0f);
     }
 }
 
