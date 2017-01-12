@@ -11,7 +11,7 @@ static COLORREF cfg_spectrum_background = RGB(0, 0, 0);
 
 pfc::instance_tracker_server_t<CSpectrogramView> CSpectrogramView::g_instances;
 
-static void g_preprocess_chunk(audio_chunk & p_chunk)
+static void g_preprocess_chunk(audio_chunk & p_chunk, const audio_sample low_power_db, const audio_sample high_power_db)
 {
     static const audio_sample log10_div = 1.0f / log(10.0f);
 
@@ -28,9 +28,6 @@ static void g_preprocess_chunk(audio_chunk & p_chunk)
     uDebugLog() << "min = " << minval << ", max = " << maxval;
 #endif
 
-    static double high_power_db = 0.0;
-    static double low_power_db = -80.0;
-
     t_size data_length = p_chunk.get_used_size();
     for (t_size n = 0; n < data_length; n++)
     {
@@ -39,6 +36,14 @@ static void g_preprocess_chunk(audio_chunk & p_chunk)
         const audio_sample lerp_factor = audio_sample((power_db - low_power_db) / (high_power_db - low_power_db));
         data[n] = pfc::clip_t(lerp_factor, 0.0f, 1.0f);
     }
+}
+
+static void g_preprocess_chunk(audio_chunk & p_chunk)
+{
+    static const audio_sample g_low_power_db = -80.0;
+    static const audio_sample g_high_power_db = 0.0;
+
+	g_preprocess_chunk(p_chunk, g_low_power_db, g_high_power_db);
 }
 
 CSpectrogramView::CSpectrogramView()
