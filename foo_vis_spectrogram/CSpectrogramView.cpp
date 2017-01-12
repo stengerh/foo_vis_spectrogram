@@ -40,10 +40,7 @@ static void g_preprocess_chunk(audio_chunk & p_chunk, const audio_sample low_pow
 
 static void g_preprocess_chunk(audio_chunk & p_chunk)
 {
-    static const audio_sample g_low_power_db = -80.0;
-    static const audio_sample g_high_power_db = 0.0;
-
-	g_preprocess_chunk(p_chunk, g_low_power_db, g_high_power_db);
+	g_preprocess_chunk(p_chunk, cfg_low_power_centibel * 0.1f, cfg_high_power_centibel * 0.1f);
 }
 
 CSpectrogramView::CSpectrogramView()

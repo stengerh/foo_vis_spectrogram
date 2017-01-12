@@ -17,6 +17,9 @@ extern void g_fire_spectrum_colors_changed(const t_spectrum_color_info & p_info)
 
 extern cfg_uint cfg_frames_per_second, cfg_lines_per_second;
 
+extern cfg_int cfg_low_power_centibel;
+extern cfg_int cfg_high_power_centibel;
+
 extern void g_create_mapper(service_ptr_t<colormap> & p_out, t_spectrum_color_info p_info);
 inline void g_create_mapper(service_ptr_t<colormap> & p_out, COLORREF p_colorLow, COLORREF p_colorHigh, unsigned p_blend_mode) {g_create_mapper(p_out, t_spectrum_color_info(p_blend_mode, p_colorLow, p_colorHigh));}
 

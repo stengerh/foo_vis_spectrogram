@@ -19,6 +19,17 @@ static const GUID guid_cfg_lines_per_second = { 0x992af11b, 0xb317, 0x4b79, { 0x
 cfg_uint cfg_frames_per_second(guid_cfg_frames_per_second, 100);
 cfg_uint cfg_lines_per_second(guid_cfg_lines_per_second, 50);
 
+// {BA28E013-BC84-4074-9FC0-008437996930}
+static const GUID guid_cfg_low_power_centibel = 
+{ 0xba28e013, 0xbc84, 0x4074, { 0x9f, 0xc0, 0x0, 0x84, 0x37, 0x99, 0x69, 0x30 } };
+
+// {9FBCCCD8-3F04-4A1A-99CF-707A1FB14CEF}
+static const GUID guid_cfg_high_power_centibel = 
+{ 0x9fbcccd8, 0x3f04, 0x4a1a, { 0x99, 0xcf, 0x70, 0x7a, 0x1f, 0xb1, 0x4c, 0xef } };
+
+cfg_int cfg_low_power_centibel(guid_cfg_low_power_centibel, -800);
+cfg_int cfg_high_power_centibel(guid_cfg_high_power_centibel, 0);
+
 void g_create_mapper(service_ptr_t<colormap> & p_out, t_spectrum_color_info p_info)
 {
     switch (p_info.m_blend_mode)
