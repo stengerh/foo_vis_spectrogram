@@ -1,3 +1,8 @@
+*.nupkg
+**/packages/*
+!**/packages/build/
+#!**/packages/repositories.config
+
 /*.opensdf
 /*.sdf
 /ipch
